@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Download maps</string>
+    <string name="string_internet_connection_not_available">Inet ne dostupen</string>
+</resources>
