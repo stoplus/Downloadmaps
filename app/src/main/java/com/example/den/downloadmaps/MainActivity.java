@@ -2,6 +2,7 @@ package com.example.den.downloadmaps;
 
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.ArrayMap;
@@ -42,17 +43,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         res = getResources();
+
         XmlPullParser parser = parseXML();
-//        createSingle(parser);
         createArrayMap(parser, true);
         parser = parseXML();
         createArrayMap(parser, false);
         list = createList(parentName);
 
-        listView = (ListView) findViewById(R.id.listView);
+        listView = findViewById(R.id.listView);
         adapter = new MyAdapter(this, R.layout.adapter_for_list, list);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        ViewCompat.setNestedScrollingEnabled(listView, true);
     }//onCreate
 
     private XmlPullParser parseXML() {
@@ -191,9 +193,9 @@ public class MainActivity extends AppCompatActivity {
             int n = pathParents.size() - 2;
             parentName = pathParents.get(n);
 
-          if (parentName.equals("continent")){
-              toolbar.setTitle(res.getString(R.string.app_name));
-          }else toolbar.setTitle(parentName);
+            if (parentName.equals("continent")) {
+                toolbar.setTitle(res.getString(R.string.app_name));
+            } else toolbar.setTitle(parentName);
 
             pathParents.remove(n + 1);
             flagAddParent = false;
