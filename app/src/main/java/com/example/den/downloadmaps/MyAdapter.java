@@ -3,6 +3,7 @@ package com.example.den.downloadmaps;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -88,7 +89,7 @@ public class MyAdapter extends ArrayAdapter<Place> {
 
         viewHolder.text.setText(place.get(position).getName());
 
-        if (place.get(position).isMap() == true) {
+        if (place.get(position).isMap()) {
             viewHolder.download.setImageResource(R.mipmap.ic_action_import);
         }else viewHolder.download.setVisibility(INVISIBLE);
 
@@ -100,7 +101,9 @@ public class MyAdapter extends ArrayAdapter<Place> {
                 if (InternetConnection.checkConnection(context)) {
                     downloadFile();
                 } else {
-                    Toast.makeText(context, R.string.string_internet_connection_not_available, Toast.LENGTH_LONG);
+                    AlertDialog dialog = new AlertDialog.Builder(context).create();
+                    dialog.setTitle("Нет интернета!!!");
+                    dialog.show();
                 }
             }
         };
@@ -188,25 +191,28 @@ public class MyAdapter extends ArrayAdapter<Place> {
     @SuppressLint("StaticFieldLeak")
     private void task(final Response<ResponseBody> response) {
         checkPermission();
-        final Dialog dialog = new Dialog(context);
+        final AlertDialog dialog = new AlertDialog.Builder(context).create();
 
 
         new AsyncTask<Void, Void, Void>() {
 
             @Override
             protected void onPreExecute() {
-                super.onPreExecute();
-
                 if (response.isSuccessful()) {
                     dialog.setTitle("Ожидайте, начато скачивание!!!");
+                    dialog.show();
+
                 } else {
                     dialog.setTitle("нет Респонзе");
+                    dialog.show();
+                    onCancelled();
                 }
-                dialog.show();
+                super.onPreExecute();
             }
 
             @Override
             protected Void doInBackground(Void... voids) {
+                if (isCancelled()) return null;
                 writeResponseBodyToDisk(response.body());
                 return null;
             }
@@ -215,9 +221,14 @@ public class MyAdapter extends ArrayAdapter<Place> {
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
                 dialog.cancel();
-                Dialog dialog1 = new Dialog(context);
+                AlertDialog dialog1 = new AlertDialog.Builder(context).create();
                 dialog1.setTitle("Скачано");
                 dialog1.show();
+            }
+
+            @Override
+            protected void onCancelled() {
+                super.onCancelled();
             }
         }.execute();
     }
